@@ -1,0 +1,53 @@
+<component name="libraryTable">
+  <library name="lib">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/commons-codec-1.11.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/gson-2.8.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/mysql-connector-java-5.1.44-bin.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/mail/activation-1.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/mail/javax.mail-1.5.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/mail/javax.mail-api-1.5.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/commons-lang3-3.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/commons-collections4-4.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/mybatis-3.5.6/mybatis-3.5.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/c3p0-0.9.5.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/jackson-annotations-2.11.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/jackson-core-2.11.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/jackson-databind-2.11.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/mchange-commons-java-0.2.15.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-buffer-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-codec-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-codec-dns-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-codec-http-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-codec-http2-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-codec-socks-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-common-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-handler-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-handler-proxy-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-resolver-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-resolver-dns-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-tcnative-boringssl-static-2.0.29.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-transport-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-transport-native-epoll-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-transport-native-kqueue-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/netty-transport-native-unix-common-4.1.49.Final.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-auth-common-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-auth-jdbc-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-auth-jwt-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-auth-oauth2-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-core-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-hazelcast-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-jdbc-client-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-jwt-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-sql-common-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-web-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-web-client-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-web-common-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/vert.x-3.9.4/vertx-bridge-common-3.9.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/log4j/log4j-api-2.17.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/backendVertx/lib/log4j/log4j-core-2.17.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

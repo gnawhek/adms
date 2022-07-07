@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dma.domain.common.mapper.admin.QNAElementMapper">
+    <!-- QNAElement: 코드 목록 -->
+    <select id="SELECT_QNA_ELEMENT_CODE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_PWI_ELEM, fn_get_i18n(N_PWI_ELEM, #{N_LANG}) as N_PWI_ELEM
+        FROM t_alg_pwi_elem
+        WHERE C_TYPE = 'QNA'
+        ORDER BY C_UI_RESULT, I_SORT;
+    </select>
+
+    <!-- QNAElement: ELEMENT_QNA 목록 -->
+    <select id="SELECT_QNA_ELEMENT_QNA_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT A.C_PWI_ELEM, A.C_CODE, A.S_EXCEPTION, fn_get_i18n(B.S_QUESTION, #{N_LANG}) AS S_QUESTION
+        FROM t_alg_pwi_elem_qna A,
+             t_alg_qna_template B
+        WHERE A.C_PWI_ELEM = #{C_PWI_ELEM}
+          AND A.C_CODE = B.C_CODE;
+    </select>
+
+    <!-- QNAElement: Template 목록 -->
+    <select id="SELECT_QNA_ELEMENT_TEMPLATE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE, fn_get_i18n(S_QUESTION, #{N_LANG}) S_QUESTION, fn_get_i18n(S_ANS, #{N_LANG}) S_ANS
+        FROM t_alg_qna_template
+        WHERE C_CODE LIKE CONCAT('%', #{C_CODE}, '%')
+          AND S_QUESTION IN (
+            SELECT S_CODE
+            FROM t_i18n
+            WHERE S_CODE LIKE 'qna_template.s_question.%'
+              AND S_LOCALE = #{N_LANG}
+              AND S_DESC LIKE CONCAT('%', #{S_QUESTION}, '%')
+        );
+    </select>
+
+    <!-- QNAElement: 엘리먼트 -->
+    <select id="SELECT_QNA_ELEMENT_TEMPLATE" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE,
+               S_PWI_SEX,
+               S_PWI_AGE,
+               S_ICON_URL,
+               fn_get_i18n(S_QUESTION, #{N_LANG}) S_QUESTION,
+               fn_get_i18n(S_ANS, #{N_LANG})      S_ANS
+        FROM t_alg_qna_template
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- QNAElement: ELEMENT_QNA 추가 -->
+    <insert id="INSERT_QNA_ELEMENT_QNA_ELEMENT" parameterType="hashmap">
+        INSERT INTO t_alg_pwi_elem_qna
+            (C_PWI_ELEM, C_CODE, S_EXCEPTION, I_LST, D_MOD_DT)
+        VALUES (#{C_PWI_ELEM}, #{C_CODE}, #{S_EXCEPTION}, #{LOGIN_I_ID}, NOW());
+    </insert>
+
+    <!-- QNAElement: ELEMENT_QNA 수정 -->
+    <update id="UPDATE_QNA_ELEMENT_QNA_ELEMENT" parameterType="hashmap">
+        UPDATE t_alg_pwi_elem_qna
+        SET S_EXCEPTION=#{S_EXCEPTION},
+            I_LST=#{LOGIN_I_ID},
+            D_MOD_DT=NOW()
+        WHERE C_PWI_ELEM = #{C_PWI_ELEM}
+          AND C_CODE = #{C_CODE}
+    </update>
+
+    <!-- QNAElement: ELEMENT_QNA 삭제 -->
+    <delete id="DELETE_QNA_ELEMENT_QNA_ELEMENT" parameterType="hashmap">
+        DELETE
+        FROM t_alg_pwi_elem_qna
+        WHERE C_PWI_ELEM = #{C_PWI_ELEM}
+          AND C_CODE = #{C_CODE};
+    </delete>
+</mapper>

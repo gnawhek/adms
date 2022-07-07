@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dma.domain.common.mapper.admin.QNAMapper">
+    <!-- QNA관리: 코드 목록 -->
+    <select id="SELECT_QNA_MANAGEMENT_CODE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE, fn_get_i18n(N_CODE, #{N_LANG}) AS N_CODE, C_EXTRA AS Y_REQUIRED
+        FROM t_sys_code
+        WHERE C_GRP = 'alg.qna.group'
+        ORDER BY I_SORT;
+    </select>
+
+    <!-- QNA관리: 코드 QNA 목록 -->
+    <select id="SELECT_QNA_MANAGEMENT_CODE_QNA_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT A.C_QNA_GRP, A.C_CODE, fn_get_i18n(B.S_QUESTION, #{N_LANG}) S_QUESTION, A.I_SORT
+        FROM t_alg_qna_tpl A,
+             t_alg_qna_template B
+        WHERE A.C_CODE = B.C_CODE
+          AND A.C_QNA_GRP = #{C_QNA_GRP};
+    </select>
+
+    <!-- 솔루션: 코드 QNA 순서 수정 -->
+    <update id="UPDATE_QNA_MANAGEMENT_CODE_QNA_SORT" parameterType="hashmap">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE t_alg_qna_tpl
+            SET I_SORT = #{item.I_SORT},
+            I_LST = #{LOGIN_I_ID},
+            D_MOD_DT = NOW()
+            WHERE C_CODE = #{item.C_CODE}
+        </foreach>
+    </update>
+
+    <!-- QNA관리: QNA Template 추가 -->
+    <insert id="INSERT_QNA_MANAGEMENT_CODE_QNA" parameterType="hashmap">
+        INSERT INTO t_alg_qna_tpl(C_QNA_GRP, C_CODE, I_SORT, I_LST, D_MOD_DT)
+        VALUES (#{C_QNA_GRP}, #{C_CODE}, (SELECT IFNULL(MAX(I_SORT), 1) FROM t_alg_qna_tpl AS A WHERE C_QNA_GRP = #{C_QNA_GRP}), #{LOGIN_I_ID}, NOW());
+    </insert>
+
+    <!-- QNA관리: 코드 QNA 삭제 -->
+    <delete id="DELETE_QNA_MANAGEMENT_CODE_QNA" parameterType="hashmap">
+        DELETE
+        FROM t_alg_qna_tpl
+        WHERE C_QNA_GRP = #{C_QNA_GRP}
+          AND C_CODE = #{C_CODE};
+    </delete>
+
+    <!-- QNA관리: 템플릿 목록 -->
+    <select id="SELECT_QNA_MANAGEMENT_TEMPLATE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE, fn_get_i18n(S_QUESTION, #{N_LANG}) S_QUESTION, fn_get_i18n(S_ANS, #{N_LANG}) S_ANS
+        FROM t_alg_qna_template
+        WHERE C_CODE LIKE CONCAT('%', #{C_CODE}, '%')
+          AND S_QUESTION IN (
+            SELECT S_CODE
+            FROM t_i18n
+            WHERE S_CODE LIKE 'qna_template.s_question.%'
+              AND S_LOCALE = #{N_LANG}
+              AND S_DESC LIKE CONCAT('%', #{S_QUESTION}, '%')
+        );
+    </select>
+
+    <!-- QNA관리: 템플릿 확인 -->
+    <select id="SELECT_QNA_MANAGEMENT_TEMPLATE_EXISTS" parameterType="hashmap" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_alg_qna_template
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- QNA관리: 템플릿 -->
+    <select id="SELECT_QNA_MANAGEMENT_TEMPLATE" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE,
+               S_PWI_SEX,
+               S_PWI_AGE,
+               S_ICON_URL,
+               fn_get_i18n(S_QUESTION, #{N_LANG}) S_QUESTION,
+               fn_get_i18n(S_ANS, #{N_LANG}) S_ANS
+        FROM t_alg_qna_template
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- QNA관리: QNA Template 추가 -->
+    <insert id="INSERT_QNA_MANAGEMENT_TEMPLATE" parameterType="hashmap">
+        INSERT INTO t_alg_qna_template (C_CODE, S_PWI_SEX, S_PWI_AGE, S_ICON_URL, S_QUESTION, S_ANS, I_LST, D_MOD_DT)
+        VALUES (#{C_CODE}, #{S_PWI_SEX}, #{S_PWI_AGE}, #{S_ICON_URL},
+                fn_set_i18n_sb('qna_template.s_question', #{C_CODE}, #{N_LANG}, #{S_QUESTION}),
+                fn_set_i18n_sb('qna_template.s_ans', #{C_CODE}, #{N_LANG}, #{S_ANS}),
+                #{LOGIN_I_ID}, NOW());
+    </insert>
+
+    <!-- QNA관리: QNA Template 수정 -->
+    <update id="UPDATE_QNA_MANAGEMENT_TEMPLATE" parameterType="hashmap">
+        UPDATE t_alg_qna_template
+        SET S_PWI_SEX  = #{S_PWI_SEX},
+            S_PWI_AGE  = #{S_PWI_AGE},
+            S_ICON_URL = #{S_ICON_URL},
+            S_QUESTION = fn_set_i18n_sb('qna_template.s_question', #{C_CODE}, #{N_LANG}, #{S_QUESTION}),
+            S_ANS      = fn_set_i18n_sb('qna_template.s_ans', #{C_CODE}, #{N_LANG}, #{S_ANS}),
+            I_LST      = #{LOGIN_I_ID},
+            D_MOD_DT   = NOW()
+        WHERE C_CODE = #{C_CODE}
+    </update>
+
+    <!-- QNA관리: 코드 QNA 삭제 -->
+    <delete id="DELETE_QNA_MANAGEMENT_TEMPLATE" parameterType="hashmap">
+        DELETE
+        FROM t_alg_qna_tpl
+        WHERE C_CODE = #{C_CODE};
+        DELETE
+        FROM t_alg_qna_template
+        WHERE C_CODE = #{C_CODE};
+    </delete>
+
+    <!-- QNA관리: 문친 데이터 저장 -->
+    <insert id="INSERT_QNA_ITEM" parameterType="hashmap">
+        INSERT INTO t_qna
+            (I_MEMID, S_DATE, C_QCODE, I_BMI, C_BMICODE, I_HEIGHT, I_WEIGHT, I_BFR, I_VWC, I_ROM, C_VER, S_QNA, Y_FIN, I_LST, D_MOD_DT)
+        VALUES (#{I_MEMID}, DATE_FORMAT(NOW(), '%Y%m'), getQCodeMemid(#{I_MEMID}),
+                getBmi2Pct(#{I_HT00}, #{I_HT01}), getBmiCode(#{I_HT01}, #{I_HT01}), #{I_HT00}, #{I_HT01}, #{I_BFR}, #{I_VWC}, #{I_ROM}, (SELECT N_CODE FROM t_sys_code WHERE C_GRP = 'sys' AND C_CODE = 'qna.version'),
+                #{S_QNA}, #{Y_FIN}, #{LOGIN_I_ID}, NOW()) ON DUPLICATE KEY
+        UPDATE
+            I_BMI=getBmi2Pct(#{I_HT00}, #{I_HT01}),
+            C_BMICODE=getBmiCode(#{I_HT01}, #{I_HT01}),
+            I_HEIGHT=#{I_HT00},
+            I_WEIGHT=#{I_HT01},
+            C_VER=(SELECT N_CODE FROM t_sys_code WHERE C_GRP='sys' AND C_CODE = 'qna.version'),
+            S_QNA= #{S_QNA},
+            Y_FIN=#{Y_FIN},
+            I_LST=#{LOGIN_I_ID},
+            D_MOD_DT=NOW()
+    </insert>
+
+    <!-- QNA관리: 문진 완료시 로그인 맵에 키, 몸무게 정보 저장 -->
+    <update id="UPDATE_QNA_USER_INFO" parameterType="hashmap">
+        UPDATE t_login_map
+        SET I_HEIGHT = #{I_HT00},
+            I_WEIGHT = #{I_HT01}
+        WHERE I_MEMID = #{I_MEMID};
+    </update>
+</mapper>

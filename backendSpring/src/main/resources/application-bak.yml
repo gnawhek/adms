@@ -1,0 +1,23 @@
+server:
+  port: 8070
+
+spring:
+  profiles.active: dev
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://210.123.245.133:59265/cas?allowMultiQueries=true&useSSL=false
+    username: remoshot
+    password: remoshot
+  sql:
+    init:
+      encoding: UTF-8
+
+logging:
+  level:
+    org.springframework.boot.web.embedded.tomcat: info
+    com.dma: debug
+    com.dma.core.Intercepts: info
+
+dma:
+  encrypt: false

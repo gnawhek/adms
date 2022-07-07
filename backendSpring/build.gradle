@@ -1,0 +1,103 @@
+plugins {
+	id 'org.springframework.boot' version '2.5.5'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+	id 'war'
+}
+
+group = 'kr.co'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'junit:junit:4.13.2'
+
+	compile 'org.json:json:20200518'
+    compile 'org.apache.commons:commons-lang3:3.10'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'	/* User */
+	implementation 'javax.xml.bind:jaxb-api:2.2.4'	/* javax.xml.bind */
+	implementation 'com.google.code.gson:gson'	/* HttpUtil, JsonUtil */
+	implementation 'org.apache.httpcomponents:httpclient:4.5.13' /* HttpClientConfiguration */
+	compile 'commons-io:commons-io:2.11.0'	/* FileStorageService */
+
+	compile 'org.springframework.boot:spring-boot-starter-data-redis' /* RedisConfiguration */
+	implementation 'it.ozimov:embedded-redis:0.7.2' /* EmbeddedRedisConfiguration */
+
+	// <<< Log4j2 보안취약점 대응
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.1'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.17.1'
+	// implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.1'
+	// implementation group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '2.17.1'
+	// implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.1'
+	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.32'
+	// >>> Log4j2 보안취약점 대응
+
+	// <<< h2-console
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'mysql:mysql-connector-java'
+	// >>> h2-console
+
+	// <<< spring.database.url 설정 필요. compileOnly 로 하면 배포시 문제됨
+	compile 'mysql:mysql-connector-java'
+	compile 'org.springframework.boot:spring-boot-starter-jdbc'	
+	compile 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.1'    /* MyBatis */
+    implementation 'org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16'  /* MyBatis 쿼리 로그 출력 */
+	implementation("org.mariadb.jdbc:mariadb-java-client:2.7.3")
+	implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
+	// >>> spring.database.url 설정 필요
+	
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'		/* JwtTokenProvider : WebSocket */
+	implementation 'net.rakugakibox.util:yaml-resource-bundle:1.1' /* MessageConfiguration : 한글화 */
+
+	// <<< lombok : 컴파일시 @Slf4j 나 log  에러가 발생할 경우
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'  
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	// >>> lombok 
+
+	// <<< swagger
+	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+	// >>> swagger
+
+	// <<< AWS SDK 1
+	implementation platform('com.amazonaws:aws-java-sdk-bom:1.11.1000')
+	implementation 'com.amazonaws:aws-java-sdk-core'
+	implementation 'com.amazonaws:aws-java-sdk-dynamodb'
+	implementation 'com.amazonaws:aws-java-sdk-s3'
+	implementation 'com.amazonaws:aws-java-sdk-s3control'
+	implementation 'com.amazonaws:aws-java-sdk-s3outposts'
+	// >>> AWS SDK 1
+
+	// <<< AWS SDK 2
+	implementation platform('software.amazon.awssdk:bom:2.17.117')
+	implementation 'software.amazon.awssdk:s3'
+	implementation 'software.amazon.awssdk:dynamodb'
+	// >>> AWS SDK 2
+	// https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload
+	implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.4'
+}
+
+task copyDistDir() {
+	group = '_custom'
+	doLast {
+		copy {
+            from "../frontend/dist/spa"
+            include "**"
+            into "src/main/resources/static"
+        }
+	}
+}
+
+tasks.bootJar.dependsOn(copyDistDir)
+
+test {
+	useJUnitPlatform()
+}

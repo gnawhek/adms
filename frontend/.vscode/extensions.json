@@ -1,0 +1,28 @@
+{
+  "recommendations": [
+    "alphabotsec.vscode-eclipse-keybindings",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "gabrielbb.vscode-lombok",
+    "kisstkondoros.typelens",
+    "krizzdewizz.goto-last-edit-location",
+    "nucllear.vscode-extension-auto-import",
+    "pivotal.vscode-boot-dev-pack",
+    "pivotal.vscode-spring-boot",
+    "redhat.java",
+    "rvest.vs-code-prettier-eslint",
+    "sdras.vue-vscode-extensionpack",
+    "sdras.vue-vscode-snippets",
+    "shan.code-settings-sync",
+    "visualstudioexptteam.vscodeintellicode",
+    "vscjava.vscode-gradle",
+    "vscjava.vscode-java-debug",
+    "vscjava.vscode-java-dependency",
+    "vscjava.vscode-java-pack",
+    "vscjava.vscode-java-test",
+    "vscjava.vscode-maven",
+    "vscjava.vscode-spring-initializr",
+    "johnsoncodehk.volar"
+  ],
+  "unwantedRecommendations": ["hookyqr.beautify", "dbaeumer.jshint", "ms-vscode.vscode-typescript-tslint-plugin"]
+}

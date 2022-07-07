@@ -1,0 +1,21 @@
+spring:
+  profiles.active: oper
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/cas?allowMultiQueries=true&useSSL=false
+    username: admin
+    password: admin
+
+  redis:
+    embedded-server-start: true
+    host: 127.0.0.1
+    port: 6379
+    timeout: 3000
+
+myconf:
+  websocket:
+    url: /ws-stomp
+    heartbeat.enabled: true
+  auth:
+    use: true #auth.use

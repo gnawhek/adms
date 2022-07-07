@@ -1,0 +1,184 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dma.domain.common.mapper.admin.SolutionMapper">
+    <!-- 솔루션: 카테고리 목록 -->
+    <select id="SELECT_SOLUTION_CATEGORY_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE, fn_get_i18n(N_NAME, #{N_LANG}) N_NAME, fn_get_cmid_tpl(C_CMID_TPL) AS CM_IDS, I_SORT
+        FROM t_sol_category
+        WHERE C_CMID_TPL IN (SELECT C_CODE FROM t_sys_cmid_tpl WHERE CM_ID LIKE CONCAT('%', #{CM_ID}))
+        ORDER BY I_SORT;
+    </select>
+
+    <!-- 솔루션: 카테고리 확인 -->
+    <select id="SELECT_SOLUTION_CATEGORY_EXISTS" parameterType="hashmap" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_sol_category
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- 솔루션: 카테고리 추가 -->
+    <insert id="INSERT_SOLUTION_CATEGORY" parameterType="hashmap">
+        INSERT INTO t_sol_category
+            (C_CODE, N_NAME, C_CMID_TPL, I_SORT, I_LST, D_MOD_DT)
+        VALUES (#{C_CODE},
+                fn_set_i18n_sb('t_sol_category', #{C_CODE}, #{N_LANG}, #{N_NAME}),
+                fn_set_cmid_tpl(CONCAT('t_sol_category.', #{C_CODE}), #{CM_IDS}),
+                (SELECT IFNULL(MAX(I_SORT) + 1, 1) FROM t_sol_category t), #{LOGIN_I_ID}, NOW());
+    </insert>
+
+    <!-- 솔루션: 카테고리 수정 -->
+    <update id="UPDATE_SOLUTION_CATEGORY" parameterType="hashmap">
+        UPDATE t_sol_category
+        SET N_NAME     = fn_set_i18n_sb('t_sol_category', #{C_CODE}, #{N_LANG}, #{N_NAME}),
+            C_CMID_TPL = fn_set_cmid_tpl(CONCAT('t_sol_category.', #{C_CODE}), #{CM_IDS}),
+            I_LST      = #{LOGIN_I_ID},
+            D_MOD_DT   = NOW()
+        WHERE C_CODE = #{C_CODE}
+    </update>
+
+    <!-- 솔루션: 카테고리 삭제 -->
+    <delete id="DELETE_SOLUTION_CATEGORY" parameterType="hashmap">
+        DELETE
+        FROM t_sol_category
+        WHERE C_CODE = #{C_CODE}
+    </delete>
+
+    <!-- 솔루션: 카테고리 순서 수정 -->
+    <update id="UPDATE_SOLUTION_CATEGORY_SORT" parameterType="hashmap">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE t_sol_category
+            SET I_SORT = #{item.I_SORT},
+            I_LST = #{LOGIN_I_ID},
+            D_MOD_DT = NOW()
+            WHERE C_CODE = #{item.C_CODE}
+        </foreach>
+    </update>
+
+    <!-- 솔루션: 제품 목록 -->
+    <select id="SELECT_SOLUTION_CONTENT_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT A.I_SEQ, B.C_CODE, fn_get_i18n(B.S_TITLE, #{N_LANG}) S_TITLE, B.S_PWI, A.I_SORT
+        FROM t_sol_category_tpl A,
+             t_sol_template B
+        WHERE A.C_CODE_CGY = #{C_CODE_CGY}
+          AND A.C_CODE = B.C_CODE
+        ORDER BY I_SORT;
+    </select>
+
+    <!-- 솔루션: 제품 추가 -->
+    <insert id="INSERT_SOLUTION_CONTENT" parameterType="hashmap">
+        INSERT INTO t_sol_category_tpl
+        (C_CODE_CGY,
+         C_CODE,
+         I_SORT,
+         I_LST,
+         D_MOD_DT)
+        VALUES (#{C_CODE_CGY},
+                #{C_CODE},
+                (SELECT IFNULL(MAX(I_SORT) + 1, 1)
+                 FROM t_sol_category_tpl T
+                 WHERE C_CODE = #{C_CODE}
+                   AND C_CODE_CGY = #{C_CODE_CGY}
+                ),
+                #{LOGIN_I_ID},
+                NOW())
+    </insert>
+
+    <!-- 솔루션: 제품 삭제 -->
+    <delete id="DELETE_SOLUTION_CONTENT" parameterType="hashmap">
+        DELETE
+        FROM t_sol_category_tpl
+        WHERE I_SEQ = #{I_SEQ};
+    </delete>
+
+    <!-- 솔루션: 제품 순서 수정 -->
+    <update id="UPDATE_SOLUTION_CONTENT_SORT" parameterType="hashmap">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE t_sol_category_tpl
+            SET I_SORT = #{item.I_SORT},
+            I_LST = #{LOGIN_I_ID},
+            D_MOD_DT = NOW()
+            WHERE I_SEQ = #{item.I_SEQ}
+        </foreach>
+    </update>
+
+    <!-- 솔루션: 템플릿 목록 -->
+    <select id="SELECT_SOLUTION_TEMPLATE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE, fn_get_i18n(S_TITLE, #{N_LANG}) S_TITLE, S_PWI
+        FROM t_sol_template
+        WHERE C_CODE LIKE CONCAT('%', #{C_CODE}, '%')
+          AND S_TITLE IN (
+            SELECT S_CODE
+            FROM t_i18n
+            WHERE S_CODE LIKE 'i18n.sol.template.title%'
+              AND S_LOCALE = #{N_LANG}
+              AND S_DESC LIKE CONCAT('%', #{S_TITLE}, '%')
+        )
+          AND S_PWI LIKE CONCAT('%', #{S_PWI}, '%')
+        ORDER BY C_CODE
+    </select>
+
+    <!-- 솔루션: 템플릿 확인 -->
+    <select id="SELECT_SOLUTION_TEMPLATE_EXISTS" parameterType="hashmap" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_sol_template
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- 솔루션: 템플릿 -->
+    <select id="SELECT_SOLUTION_TEMPLATE" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE,
+               fn_get_i18n(S_TITLE, #{N_LANG}) S_TITLE,
+               S_PWI_SEX,
+               S_PWI_AGE,
+               S_PWI,
+               Y_WEEK,
+               S_WEEK,
+               C_TYPE,
+               S_CONTENT
+        FROM t_sol_template
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- 솔루션: 템플릿 추가 -->
+    <insert id="INSERT_SOLUTION_TEMPLATE" parameterType="hashmap">
+        INSERT INTO t_sol_template (C_CODE, S_TITLE, S_PWI_SEX, S_PWI_AGE, S_PWI, Y_WEEK, S_WEEK, C_TYPE, S_CONTENT, I_LST, D_MOD_DT)
+        VALUES (#{C_CODE},
+                fn_set_i18n(CONCAT('i18n.sol.template.title.', #{C_CODE}), #{N_LANG}, #{S_TITLE}),
+                #{S_PWI_SEX},
+                #{S_PWI_AGE},
+                #{S_PWI},
+                #{Y_WEEK},
+                #{S_WEEK},
+                #{C_TYPE},
+                #{S_CONTENT},
+                #{LOGIN_I_ID},
+                NOW());
+    </insert>
+
+    <!-- 솔루션: 템플릿 수정 -->
+    <update id="UPDATE_SOLUTION_TEMPLATE" parameterType="hashmap">
+        UPDATE t_sol_template
+        SET S_TITLE   = fn_set_i18n(CONCAT('i18n.sol.template.title.', #{C_CODE}), #{N_LANG}, #{S_TITLE}),
+            S_PWI_SEX = #{S_PWI_SEX},
+            S_PWI_AGE = #{S_PWI_AGE},
+            S_PWI     = #{S_PWI},
+            Y_WEEK    = #{Y_WEEK},
+            S_WEEK    = #{S_WEEK},
+            C_TYPE    = #{C_TYPE},
+            S_CONTENT = #{S_CONTENT},
+            I_LST     = #{LOGIN_I_ID},
+            D_MOD_DT  = NOW()
+        WHERE C_CODE = #{C_CODE}
+    </update>
+
+    <!-- 솔루션: 템플릿 삭제 -->
+    <delete id="DELETE_SOLUTION_TEMPLATE" parameterType="hashmap">
+        DELETE
+        FROM t_sol_category_tpl
+        WHERE C_CODE = #{C_CODE};
+        DELETE
+        FROM t_sol_template
+        WHERE C_CODE = #{C_CODE};
+    </delete>
+</mapper>

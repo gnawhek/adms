@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dma.domain.common.mapper.admin.PWIElementMapper">
+    <!-- PWIElement: PWI 목록 -->
+    <select id="SELECT_PWI_ELEMENT_PWI_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_PWI, fn_get_i18n(n_pwi, #{N_LANG}) as N_PWI, C_PARENT, C_TYPE, C_ALIAS, Y_CHILD
+        FROM t_alg_pwi
+        ORDER BY I_SORT;
+    </select>
+
+    <!-- PWIElement: ELEMENT_TUPLE 목록 -->
+    <select id="SELECT_PWI_ELEMENT_TUPLE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT B.C_TYPE, A.C_PWI, B.C_PWI_ELEM, fn_get_i18n(B.N_PWI_ELEM, #{N_LANG}) N_PWI_ELEM
+        FROM t_alg_pwi_elem_tuple A,
+             t_alg_pwi_elem B
+        WHERE A.C_PWI = #{C_PWI}
+          AND A.C_PWI_ELEM = B.C_PWI_ELEM
+        ORDER BY C_TYPE, C_PWI_ELEM;
+    </select>
+
+    <!-- PWIElement: ELEMENT_TUPLE 추가 -->
+    <insert id="INSERT_PWI_ELEMENT_TUPLE_ELEMENT" parameterType="hashmap">
+        INSERT INTO t_alg_pwi_elem_tuple
+            (C_PWI, C_PWI_ELEM, I_LST, D_MOD_DT)
+        VALUES (#{C_PWI}, #{C_PWI_ELEM}, #{LOGIN_I_ID}, NOW());
+    </insert>
+
+    <!-- PWIElement: ELEMENT_TUPLE 삭제 -->
+    <delete id="DELETE_PWI_ELEMENT_TUPLE_ELEMENT" parameterType="hashmap">
+        DELETE
+        FROM t_alg_pwi_elem_tuple
+        WHERE C_PWI = #{C_PWI}
+          AND C_PWI_ELEM = #{C_PWI_ELEM};
+    </delete>
+
+    <!-- PWIElement: 엘리먼트 목록 -->
+    <select id="SELECT_PWI_ELEMENT_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_TYPE, C_PWI_ELEM, fn_get_i18n(N_PWI_ELEM, #{N_LANG}) AS N_PWI_ELEM, C_UI_RESULT, I_SORT
+        FROM t_alg_pwi_elem
+        WHERE C_TYPE LIKE CONCAT('%', #{C_TYPE})
+          AND C_PWI_ELEM LIKE CONCAT('%', #{C_PWI_ELEM}, '%')
+          AND N_PWI_ELEM IN (
+            SELECT S_CODE
+            FROM t_i18n
+            WHERE S_CODE LIKE 't_alg.%'
+              AND S_LOCALE = #{N_LANG}
+              AND S_DESC LIKE CONCAT('%', #{N_PWI_ELEM}, '%')
+        );
+    </select>
+
+    <!-- PWIElement: 엘리먼트 -->
+    <select id="SELECT_PWI_ELEMENT" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_TYPE,
+               C_PWI_ELEM,
+               fn_get_i18n(N_PWI_ELEM, #{N_LANG}) N_PWI_ELEM,
+               C_UI_RESULT,
+               Y_UI_RESULT,
+               Y_ALZ_RESULT,
+               I_SORT
+        FROM t_alg_pwi_elem
+        WHERE C_PWI_ELEM = #{C_PWI_ELEM}
+    </select>
+
+    <!-- PWIElement: 템플릿 확인 -->
+    <select id="SELECT_PWI_ELEMENT_EXISTS" parameterType="hashmap" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_alg_pwi_elem
+        WHERE C_PWI_ELEM = #{C_PWI_ELEM}
+    </select>
+
+    <!-- PWIElement: 엘리먼트 추가 -->
+    <insert id="INSERT_PWI_ELEMENT" parameterType="hashmap">
+        INSERT INTO t_alg_pwi_elem (C_PWI_ELEM, N_PWI_ELEM, C_TYPE, C_UI_RESULT, Y_UI_RESULT, Y_ALZ_RESULT, I_SORT, D_MOD_DT)
+        VALUES (#{C_PWI_ELEM}, fn_set_i18n_sb('t_alg', #{C_PWI_ELEM}, #{N_LANG}, #{N_PWI_ELEM}),
+                #{C_TYPE}, #{C_UI_RESULT}, #{Y_UI_RESULT}, #{Y_ALZ_RESULT}, #{I_SORT}, NOW());
+    </insert>
+
+    <!-- PWIElement: 엘리먼트 수정 -->
+    <update id="UPDATE_PWI_ELEMENT" parameterType="hashmap">
+        UPDATE t_alg_pwi_elem
+        SET C_TYPE=#{C_TYPE},
+            N_PWI_ELEM=fn_set_i18n_sb('t_alg', #{C_PWI_ELEM}, #{N_LANG}, #{N_PWI_ELEM}),
+            C_UI_RESULT=#{C_UI_RESULT},
+            Y_UI_RESULT=#{Y_UI_RESULT},
+            Y_ALZ_RESULT=#{Y_ALZ_RESULT},
+            I_SORT=#{I_SORT},
+            D_MOD_DT=NOW()
+        WHERE C_PWI_ELEM = #{C_PWI_ELEM};
+    </update>
+
+    <!-- PWIElement: 엘리먼트 삭제 -->
+    <delete id="DELETE_PWI_ELEMENT" parameterType="hashmap">
+        DELETE
+        FROM t_alg_pwi_elem_tuple
+        WHERE C_PWI_ELEM = #{C_PWI_ELEM};
+        DELETE
+        FROM t_alg_pwi_elem
+        WHERE C_PWI_ELEM = #{C_PWI_ELEM};
+    </delete>
+</mapper>

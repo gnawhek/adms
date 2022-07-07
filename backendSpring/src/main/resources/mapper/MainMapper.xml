@@ -1,0 +1,370 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dma.domain.common.mapper.MainMapper">
+    <select id="SELECT_SYS_VERSION" resultType="java.lang.String">
+        SELECT N_CODE
+        FROM t_sys
+        WHERE C_CODE = 'version'
+    </select>
+
+    <sql id="GET_LIMIT">
+        <if test="TO_LOAD != null and TO_LIMIT != null">
+            LIMIT #{TO_LOAD}, #{TO_LIMIT}
+        </if>
+    </sql>
+
+    <select id="SELECT_SEARCH_EXISTING_CUSTOMERS_LIST" parameterType="java.util.HashMap" resultType="com.dma.share.ResultMap">
+        SELECT A.I_MEMID ,
+        B.I_ID ,
+        B.N_NAME ,
+        B.C_SEX ,
+        fn_age(B.D_BIRTH , NOW()) AS I_AGE ,
+        A.C_SHOP N_SHOP ,
+        A.C_SHOP ,
+        B.I_HP ,
+        B.S_EMAIL ,
+        DATE_FORMAT(B.D_BIRTH, '%Y-%m-%d') D_BIRTH,
+        A.D_REG_DT,
+        #{SORT} TEST
+        FROM t_customer A, t_login_map B
+        <where>
+            <!--            <choose>-->
+            <!--                <when test="ALL == true">-->
+            <!--                    A.C_SHOP IN (<include refid="GET_SHOP_LIST"/>)-->
+            <!--                </when>-->
+            <!--                <otherwise>-->
+            <!--                    A.C_SHOP IN (<include refid="GET_DASHBOARD_SHOP_LIST"/>)-->
+            <!--                </otherwise>-->
+            <!--            </choose>-->
+            <if test="N_NAME != null">
+                AND B.N_NAME LIKE CONCAT('%',#{N_NAME},'%')
+            </if>
+            <if test="I_HP != null">
+                AND B.I_HP LIKE CONCAT('%',#{I_HP},'%')
+            </if>
+            AND A.I_MEMID = B.I_MEMID
+            AND IFNULL(A.Y_USE,'y') != 'n'
+            <choose>
+                <when test="SORT == 'N_NAME'">ORDER BY B.N_NAME ASC</when>
+                <when test="SORT == '-N_NAME'">ORDER BY B.N_NAME DESC</when>
+                <when test="SORT == 'I_ID'">ORDER BY B.I_ID ASC</when>
+                <when test="SORT == '-I_ID'">ORDER BY B.I_ID DESC</when>
+                <when test="SORT == 'C_SEX'">ORDER BY B.C_SEX ASC</when>
+                <when test="SORT == '-C_SEX'">ORDER BY B.C_SEX DESC</when>
+                <when test="SORT == 'I_AGE'">ORDER BY I_AGE ASC</when>
+                <when test="SORT == '-I_AGE'">ORDER BY I_AGE DESC</when>
+                <when test="SORT == 'N_SHOP'">ORDER BY N_SHOP ASC</when>
+                <when test="SORT == '-N_SHOP'">ORDER BY N_SHOP DESC</when>
+                <when test="SORT == 'I_DNA_SN'">ORDER BY B.I_DNA_SN ASC</when>
+                <when test="SORT == '-I_DNA_SN'">ORDER BY B.I_DNA_SN DESC</when>
+                <when test="SORT == 'I_MICROB_SN'">ORDER BY B.I_MICROB_SN ASC</when>
+                <when test="SORT == '-I_MICROB_SN'">ORDER BY B.I_MICROB_SN DESC</when>
+                <when test="SORT == 'I_HP'">ORDER BY B.I_HP ASC</when>
+                <when test="SORT == '-I_HP'">ORDER BY B.I_HP DESC</when>
+                <when test="SORT == 'S_EMAIL'">ORDER BY B.S_EMAIL ASC</when>
+                <when test="SORT == '-S_EMAIL'">ORDER BY B.S_EMAIL DESC</when>
+                <when test="SORT == 'D_REG_DT'">ORDER BY A.D_REG_DT ASC</when>
+                <when test="SORT == '-D_REG_DT'">ORDER BY A.D_REG_DT DESC</when>
+                <when test="SORT == 'NAME ASC'">
+                    ORDER BY B.N_NAME ASC
+                </when>
+                <when test="SORT == 'DATE ASC'">
+                    ORDER BY B.D_REG_DT ASC
+                </when>
+                <otherwise>
+                    ORDER BY A.D_REG_DT DESC
+                </otherwise>
+            </choose>
+        </where>
+        <include refid="GET_LIMIT"/>
+    </select>
+
+    <select id="SELECT_SEARCH_EXISTING_CUSTOMERS_COUNT" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT COUNT(*) COUNT
+        FROM t_customer A, t_login_map B
+        <where>
+            <!--            <choose>-->
+            <!--                <when test="ALL == true">-->
+            <!--                    A.C_SHOP IN (<include refid="GET_SHOP_LIST"/>)-->
+            <!--                </when>-->
+            <!--                <otherwise>-->
+            <!--                    A.C_SHOP IN (<include refid="GET_DASHBOARD_SHOP_LIST"/>)-->
+            <!--                </otherwise>-->
+            <!--            </choose>-->
+            <if test="N_NAME != null">
+                AND B.N_NAME LIKE CONCAT('%',#{N_NAME},'%')
+            </if>
+            <if test="I_HP != null">
+                AND B.I_HP LIKE CONCAT('%',#{I_HP},'%')
+            </if>
+            AND A.I_ID = B.I_ID
+            AND IFNULL(A.Y_USE,'y') != 'n'
+        </where>
+    </select>
+
+    <select id="SELECT_LOGIN_ID" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT COUNT(*) COUNT
+        FROM t_login_map
+        WHERE I_ID = #{I_ID}
+    </select>
+
+    <update id="USER_NEW_PW" parameterType="hashmap">
+        UPDATE t_login_map
+        <set>
+            S_PW = #{password},
+            D_MOD_DT = NOW()
+        </set>
+        WHERE I_ID = #{I_ID}
+    </update>
+
+    <select id="SELECT_FIND_LOGIN_ID" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT I_ID, N_NAME, D_REG_DT
+        FROM t_login_map
+        WHERE I_HP = #{I_HP}
+    </select>
+
+    <!-- 기업의 고객풀에 가입된 고객인지 확인 -->
+    <select id="SELECT_FIND_LOGIN_POOL" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_SHOP
+        FROM t_login_pool
+        WHERE I_HP = #{I_HP}
+    </select>
+
+    <!-- 추천인 코드에서 c_shop 과 추천인 코드를 확인한다. -->
+    <select id="SELECT_FIND_RECOMM_CODE" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_SHOP, I_RECOMM_CODE
+        FROM t_login_map
+        WHERE UPPER(I_RECOMM_CODE) = UPPER(#{I_RECOMM_CODE}) LIMIT 1
+    </select>
+
+    <!-- 파트너 목록 -->
+    <select id="SELECT_PARTNER_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT CM_ID,
+        N_PARTNER,
+        D_REG_DT
+        FROM t_partner
+        <where>
+            <if test="N_PARTNER != null">
+                N_PARTNER LIKE CONCAT('%',#{N_PARTNER},'%')
+            </if>
+        </where>
+        ORDER BY N_PARTNER
+    </select>
+
+    <!-- 성별 목록 -->
+    <select id="SELECT_ALG_SEX_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE, N_CODE
+        FROM t_sys_code tsc
+        WHERE C_GRP = 'alg.sex'
+        ORDER BY I_SORT
+    </select>
+
+    <!-- 나이 목록 -->
+    <select id="SELECT_PWI_AGE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE, fn_get_i18n(N_CODE, #{N_LANG}) N_CODE
+        FROM t_sys_code
+        WHERE C_GRP = 'pwi.age'
+        ORDER BY I_SORT
+    </select>
+
+    <!-- PWI Type 목록 -->
+    <select id="SELECT_PWI_TYPE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT P_CODE, C_CODE, N_CODE, I_SORT
+        FROM (
+                 SELECT '' AS P_CODE, C_CODE, N_CODE, I_SORT
+                 FROM t_sys_code
+                 WHERE C_GRP = 'pwi.type.basic'
+                 UNION
+                 SELECT 'HEALTH' AS P_CODE, C_CODE, N_CODE, I_SORT
+                 FROM t_sys_code
+                 WHERE C_GRP = 'pwi.type.health'
+                 UNION
+                 SELECT 'SKIN' AS P_CODE, C_CODE, N_CODE, I_SORT
+                 FROM t_sys_code
+                 WHERE C_GRP = 'pwi.type.skin'
+                 UNION
+                 SELECT 'SCALP' AS P_CODE, C_CODE, N_CODE, I_SORT
+                 FROM t_sys_code
+                 WHERE C_GRP = 'pwi.type.scalp'
+             ) A
+        ORDER BY P_CODE, I_SORT
+    </select>
+
+    <!-- 알고리즘 TS 타입 목록 -->
+    <select id="SELECT_ALG_TS_TYPE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE
+        FROM t_sys_code
+        WHERE C_GRP = 'alg.ts.type'
+        ORDER BY I_SORT;
+    </select>
+
+    <!-- 알고리즘 RESUT UI 목록 -->
+    <select id="SELECT_ALG_RESULT_UI_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE
+        FROM t_sys_code
+        WHERE C_GRP = 'alg.result.ui'
+        ORDER BY I_SORT;
+    </select>
+
+    <!-- 이미 가입한 고객인지 여부 확인 -->
+    <select id="SELECT_LOGIN_HP_EXIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT I_ID,
+        N_NAME
+        FROM t_login_map
+        <where>
+            I_HP = #{I_HP}
+        </where>
+    </select>
+
+    <!-- 기업의 고객풀에 가입된 고객인지 확인 -->
+    <select id="SELECT_LOGIN_POOL_HP_EXIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_SHOP
+        FROM T_LOGIN_POOL
+        <where>
+            I_HP = #{I_HP}
+        </where>
+    </select>
+
+    <!-- 추천인 코드에서 c_shop 과 추천인 코드를 확인한다. -->
+    <select id="SELECT_LOGIN_RECOMM_CODE" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_SHOP,
+        I_RECOMM_CODE
+        FROM t_login_map
+        <where>
+            UPPER(I_RECOMM_CODE) = UPPER(#{I_RECOMM_CODE});
+        </where>
+    </select>
+
+    <!-- 주소 지역 -->
+    <select id="SELECT_ZIP_STATE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT I_ZIP,
+        N_STATE
+        FROM t_zipcode
+        <where>
+            <![CDATA[
+            i_zip < 100
+            ]]>
+        </where>
+        ORDER BY I_ZIP;
+    </select>
+
+    <!-- 주소 행정구역 -->
+    <select id="SELECT_ZIP_CITY_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT I_ZIP ,
+        N_CITY
+        FROM t_zipcode
+        <where>
+            TRUNCATE(I_ZIP/1000,0) = #{I_ZIP}
+        </where>
+        ORDER BY I_ZIP;
+    </select>
+
+    <!-- 로그인 추가 -->
+    <sql id="INSERT_LOGIN_MAP">
+        INSERT
+        INTO t_login_map
+        (I_MEMID,
+         I_ID,
+         N_NAME,
+         S_PW,
+         C_SEX,
+         D_BIRTH,
+         I_HP,
+         S_EMAIL,
+         I_ZIPCODE,
+         Y_PRIVACY, -- 약관 상단
+         Y_MARKETING,
+         Y_PUSH,
+         Y_EMAIL, -- 약관 하단
+         Y_VERIFICATION, -- 본인인증 여부
+         Y_STAFF,
+         I_HEIGHT,
+         I_WEIGHT,
+         S_PIC_URL,
+         I_LEVEL,
+         S_DATE,
+         C_SHOP,
+         I_INVITED_CODE,
+         I_RECOMM_CODE,
+         D_LAST_LOGIN,
+         D_REG_DT,
+         D_MOD_DT,
+         Y_USE,
+         I_LST)
+        VALUES (#{I_MEMID},
+                #{I_ID},
+                #{N_NAME},
+                #{password},
+                #{C_SEX},
+                #{D_BIRTH},
+                #{I_HP},
+                #{S_EMAIL},
+                #{I_ZIPCODE},
+                #{Y_PRIVACY},
+                #{Y_MARKETING},
+                #{Y_PUSH},
+                #{Y_EMAIL},
+                'y',
+                'n',
+                #{I_HEIGHT},
+                #{I_WEIGHT},
+                #{S_PIC_URL},
+                -1,
+                NULL,
+                #{C_SHOP},
+                #{I_RECOMM_CODE},
+                fn_invite_code(#{I_ID}),
+                NULL,
+                NOW(),
+                NOW(),
+                'y',
+                #{I_ID});
+    </sql>
+
+    <!-- 고객 추가 -->
+    <sql id="INSERT_CUSTOMER">
+        INSERT
+        INTO t_customer
+        (I_MEMID,
+         C_SHOP,
+         D_REG_DT,
+         Y_USE,
+         I_LST,
+         D_MOD_DT)
+        VALUES (#{I_MEMID},
+                #{C_SHOP},
+                NOW(),
+                'y',
+                #{I_ID},
+                NOW());
+    </sql>
+
+    <!-- 신규 고객 추가 -->
+    <insert id="NewMemberRegister" parameterType="hashmap">
+        <selectKey keyProperty="I_MEMID,C_SHOP" resultType="hashmap" order="BEFORE">
+            SELECT fn_memid_new(IFNULL(#{C_SHOP}, fn_default_shop())) I_MEMID,
+            IFNULL(#{C_SHOP}, fn_default_shop()) C_SHOP
+        </selectKey>
+        <include refid="INSERT_LOGIN_MAP"></include>
+        <include refid="INSERT_CUSTOMER"></include>
+    </insert>
+
+    <!-- 파트너 목록 -->
+    <select id="SELECT_CATEGORY_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT CODE_ID
+             , CODE_NAME
+             , PARENT_CODE_ID
+             , PARENT_CODE_NAME
+             , EXPLANATION
+             , ETC
+             , SORT
+             , ENABLED
+             , CREATE_DATE
+             , CREATE_ID
+             , MODIFY_DATE
+             , MODIFY_ID
+        FROM d_common_code
+        ORDER BY CODE_ID
+    </select>
+</mapper>

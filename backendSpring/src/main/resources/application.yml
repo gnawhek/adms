@@ -1,0 +1,78 @@
+
+server:
+  port: 8070
+  compression:
+      enabled: true
+      excluded-user-agents:
+      mime-types: application/json,text/html,text/xml,text/plain,text/css,text/javascript,application/javascript
+      min-response-size: 2048
+  server.tomcat.max-http-form-post-size: 900MB
+  tomcat.max-swallow-size: 900MB
+
+spring:
+  application.name: dma
+  config.use-legacy-processing: true  # 스프링 부트 2.4 이전 레거시 구동방식 유지
+  main.allow-bean-definition-overriding: true
+  profiles.active: dev
+
+  servlet.multipart:
+    max-file-size: 900MB
+    max-request-size: 900MB
+
+  datasource:
+    sql-script-encoding: UTF-8
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://210.123.245.133:3307/cas?allowMultiQueries=true&useSSL=false
+    username: remoshot
+    password: Flahtit8394@
+    hikari:
+      connectionTimeout: 600000
+      maximumPoolSize: 20
+      maxLifetime: 600000
+      minimumIdle: 10
+      validationTimeout: 30000
+      idleTimeout: 300000
+
+  redis:
+    embedded-server-start: true
+    host: 127.0.0.1
+    port: 6379
+    timeout: 3000
+
+  rabbitmq:
+    enabled: false  # 접속 불가 환경을 위해 추가함
+
+  jwt:
+    secret: jwtsecret12#$
+
+myconf:
+  project: dma
+  websocket:
+    enabled: true
+    url: /ws-stomp
+    heartbeat.enabled: true
+    auth-same-network: true
+  auth:
+    use: true #auth.use
+
+file:
+  access-Url: /external/**
+
+# Log4j2 보안취약점 대응 (version 2.10 ~ 2.14.1)
+log4j2.formatMsgNoLookups: true
+
+cloud:
+  aws:
+    credentials:
+      access-key: access-key
+      secret-key: secret-key
+    s3:
+      bucket: name-dev-bucket
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    endpoint: dynamodb.ap-northeast-2.amazonaws.com
+
+dma:
+  encrypt: true

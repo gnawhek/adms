@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dma.domain.user.mapper.UserMapper">
+
+    <select id="SELECT_LOGIN" parameterType="hashmap" resultType="com.dma.domain.user.dto.User">
+        SELECT A.*,
+               B.C_LEVEL,
+               B.Y_ADM,
+               B.Y_ONL,
+               B.Y_OFL,
+               B.Y_CEL
+        FROM (SELECT I_MEMID,
+                     Y_STAFF,
+                     I_ID,
+                     N_NAME,
+                     C_SEX,
+                     D_BIRTH,
+                     fn_age(D_BIRTH, NOW())                  AS I_AGE,
+                     I_HEIGHT,
+                     I_WEIGHT,
+                     I_LEVEL,
+                     S_EMAIL,
+                     I_HP,
+                     I_ZIPCODE,
+                     getQCode(fn_age(D_BIRTH, NOW()), C_SEX) AS C_QCODE,
+                     C_SHOP,
+                     FN_SHOP_NAME(C_SHOP)                    AS N_SHOP,
+                     S_PIC_URL,
+                     D_LAST_LOGIN,
+                     S_PW
+              FROM t_login_map A
+              WHERE A.I_ID = #{I_ID}
+             ) A
+                 LEFT JOIN
+             t_staff B
+             ON A.I_ID = B.I_ID;
+    </select>
+
+    <!-- 업데이트 마지막 로그인 -->
+    <update id="UPDATE_LAST_LOGIN" parameterType="hashmap">
+        UPDATE t_login_map
+        SET D_LAST_LOGIN = NOW()
+        WHERE I_ID = #{I_ID}
+    </update>
+
+    <select id="findUserByUid" parameterType="java.util.HashMap" resultType="com.dma.domain.user.dto.User">
+        SELECT I_MEMID,
+               I_ID,
+               fn_age(D_BIRTH, NOW())                  AS I_AGE,
+               A.C_SEX,
+               getQCode(fn_age(D_BIRTH, NOW()), C_SEX) AS C_QCODE,
+               S_PW,
+               UNIX_TIMESTAMP(D_LAST_LOGIN) * 1000     AS D_LAST_LOGIN,
+               Y_STAFF,
+               C_SHOP,
+               FN_SHOP_NAME(C_SHOP)                    AS N_SHOP,
+               N_NAME
+        FROM t_login_map A
+        WHERE A.I_ID = #{uid}
+    </select>
+
+    <!--    <select id="findUserByUid" parameterType="java.util.HashMap" resultType="com.dma.domain.user.dto.User">-->
+    <!--        SELECT U.UID       AS "uid",-->
+    <!--               U.NAME      AS "name",-->
+    <!--               U.PASSWORD  AS "password",-->
+    <!--               R.AGG_ROLES AS "roles"-->
+    <!--        FROM "USER" U-->
+    <!--                 LEFT OUTER JOIN-->
+    <!--             (SELECT USER_UID         AS USER_UID,-->
+    <!--                     ARRAY_AGG(roles) AS AGG_ROLES-->
+    <!--              FROM USER_ROLES-->
+    <!--              GROUP BY USER_UID) R ON (R.USER_UID = U.UID)-->
+    <!--        WHERE U.UID = #{uid} LIMIT 1-->
+    <!--    </select>-->
+
+    <insert id="insertUser" parameterType="com.dma.domain.user.dto.User">
+        INSERT
+        INTO "USER"
+        (uid,
+         password,
+         name)
+        VALUES (#{uid},
+                #{password},
+                #{name})
+    </insert>
+
+    <update id="upsertUser" parameterType="com.dma.domain.user.dto.User">
+        WITH UPSERT AS
+        ( UPDATE "USER"
+        <set>
+            <if test="password != null">
+                password = #{password},
+            </if>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="ipAddress != null">
+                ip_address = #{ipAddress},
+            </if>
+            connect_time = #{connectTime}
+        </set>
+        WHERE uid = #{uid} RETURNING * )
+        INSERT
+        INTO "USER"
+        (
+        uid,
+        password,
+        name,
+        <if test="ipAddress != null">
+            ip_address,
+        </if>
+        connect_time
+        )
+        SELECT #{uid},
+        #{password},
+        #{name},
+        <if test="ipAddress != null">
+            #{ipAddress},
+        </if>
+        now()::DATE
+        WHERE NOT EXISTS
+        (SELECT *
+        FROM UPSERT)
+    </update>
+
+    <delete id="deleteUser" parameterType="hashmap">
+        -- [command=${command}, sqlId=${sqlId}]
+        DELETE FROM
+        "USER"
+        <where>
+            <trim prefix="(" prefixOverrides="AND|OR" suffix=")" suffixOverrides="">
+                UID = #{uid}
+                <if test="name != null">
+                    AND NAME = #{name}
+                </if>
+            </trim>
+        </where>
+    </delete>
+
+    <select id="selectUserList" parameterType="java.util.HashMap" resultType="com.dma.domain.user.dto.User">
+        SELECT U.UID       AS "uid",
+               U.NAME      AS "name",
+               R.AGG_ROLES AS "roles"
+        FROM "USER" U
+                 LEFT OUTER JOIN
+             (SELECT USER_UID         AS USER_UID,
+                     ARRAY_AGG(roles) AS AGG_ROLES
+              FROM USER_ROLES
+              GROUP BY USER_UID) R ON (R.USER_UID = U.UID)
+    </select>
+
+</mapper>

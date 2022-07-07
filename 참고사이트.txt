@@ -1,0 +1,26 @@
+[draggable.next]
+https://sortablejs.github.io/vue.draggable.next/#/simple
+(옵션참고)https://theheydaze.tistory.com/316, https://github.com/SortableJS/Sortable#options
+
+[레이아웃 참고]
+Layout Builder
+https://quasar.dev/layout-builder
+
+CSS Spacing Classe
+https://quasar.dev/style/spacing
+
+Flexbox
+https://quasar.dev/layout/grid/introduction-to-flexbox
+
+CSS Positioning Classes
+https://quasar.dev/style/positioning
+
+Color Palette
+https://quasar.dev/style/color-palette
+
+Quasar Icon Sets
+https://quasar.dev/options/quasar-icon-sets
+https://fonts.google.com/icons?selected=Material+Icons&icon.query=back
+
+Dynamic Translate using vue-i18n
+https://medium.com/hong-kong-tech/dynamic-translate-using-vue-i18n-vuejs-c730093a63e2

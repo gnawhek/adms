@@ -1,0 +1,24 @@
+server:
+  port: 8070
+
+spring:
+  profiles.active: dev
+
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    #url: jdbc:mariadb://210.123.245.133:3307/cas?allowMultiQueries=true&useSSL=false
+    url: jdbc:mariadb://210.123.245.133:3307/cas?allowMultiQueries=true&useSSL=false
+    username: admin
+    password: Flahtit8394@
+  sql:
+    init:
+      encoding: UTF-8
+
+logging:
+  level:
+    org.springframework.boot.web.embedded.tomcat: info
+    com.dma: debug
+    com.dma.core.Intercepts: info
+
+dma:
+  encrypt: false

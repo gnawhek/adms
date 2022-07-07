@@ -1,0 +1,23 @@
+server:
+  port: 8070
+
+spring:
+  profiles.active: dev
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/cas?allowMultiQueries=true&useSSL=false
+    username: admin
+    password: admin
+    sql:
+      init:
+        encoding: UTF-8
+
+logging:
+  level:
+    org.springframework.boot.web.embedded.tomcat: info
+    com.dma: debug
+    com.dma.core.Intercepts: info
+
+dma:
+  encrypt: false

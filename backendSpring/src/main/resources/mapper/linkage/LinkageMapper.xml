@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dma.domain.common.mapper.linkage.LinkageMapper">
+
+    <select id="LINKAGE_SAMPLE" parameterType="java.util.HashMap" resultType="com.dma.share.ResultMap">
+        SELECT s_code, s_desc FROM t_i18n WHERE s_locale = #{S_LOCALE} LIMIT 10
+    </select>
+
+</mapper>

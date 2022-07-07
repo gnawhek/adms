@@ -1,0 +1,274 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dma.domain.common.mapper.admin.ProductMapper">
+    <!-- 제품: 카테고리 목록 -->
+    <select id="SELECT_PRODUCT_CATEGORY_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE, fn_get_i18n(N_NAME, #{N_LANG}) N_NAME, fn_get_cmid_tpl(C_CMID_TPL) AS CM_IDS, I_SORT
+        FROM t_prdt_category
+        WHERE C_CMID_TPL IN (SELECT C_CODE FROM t_sys_cmid_tpl WHERE CM_ID LIKE CONCAT('%', #{CM_ID}))
+        ORDER BY I_SORT;
+    </select>
+
+    <!-- 제품: 카테고리 확인 -->
+    <select id="SELECT_PRODUCT_CATEGORY_EXISTS" parameterType="hashmap" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_prdt_category
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- 제품: 카테고리 추가 -->
+    <insert id="INSERT_PRODUCT_CATEGORY" parameterType="hashmap">
+        INSERT
+        INTO t_prdt_category
+        (C_CODE,
+         N_NAME,
+         C_CMID_TPL,
+         I_SORT,
+         I_LST,
+         D_MOD_DT)
+        VALUES (#{C_CODE},
+                fn_set_i18n(CONCAT('prdt.category.', #{C_CODE}), #{N_LANG}, #{N_NAME}),
+                fn_set_cmid_tpl(CONCAT('prdt.category.', #{C_CODE}), #{CM_IDS}),
+                (SELECT IFNULL(MAX(I_SORT) + 1, 1)
+                 FROM t_prdt_category T
+                ),
+                #{LOGIN_I_ID},
+                NOW())
+    </insert>
+
+    <!-- 제품: 카테고리 수정 -->
+    <update id="UPDATE_PRODUCT_CATEGORY" parameterType="hashmap">
+        UPDATE t_prdt_category
+        SET N_NAME     = fn_set_i18n(CONCAT('prdt.category.', #{C_CODE}), #{N_LANG}, #{N_NAME}),
+            C_CMID_TPL = fn_set_cmid_tpl(CONCAT('prdt.category.', #{C_CODE}), #{CM_IDS}),
+            I_LST      = #{LOGIN_I_ID},
+            D_MOD_DT   = NOW()
+        WHERE C_CODE = #{C_CODE}
+    </update>
+
+    <!-- 제품: 카테고리 삭제 -->
+    <delete id="DELETE_PRODUCT_CATEGORY" parameterType="hashmap">
+        DELETE
+        FROM t_prdt_category
+        WHERE C_CODE = #{C_CODE}
+    </delete>
+
+    <!-- 제품: 카테고리 순서 수정 -->
+    <update id="UPDATE_PRODUCT_CATEGORY_SORT" parameterType="hashmap">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE t_prdt_category
+            SET I_SORT = #{item.I_SORT},
+            I_LST = #{LOGIN_I_ID},
+            D_MOD_DT = NOW()
+            WHERE C_CODE = #{item.C_CODE}
+        </foreach>
+    </update>
+
+    <!-- 제품: 그룹 목록 -->
+    <select id="SELECT_PRODUCT_GROUP_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE, fn_get_i18n(N_NAME, #{N_LANG}) N_NAME, fn_get_cmid_tpl(C_CMID_TPL) AS CM_IDS, I_SORT
+        FROM t_prdt_grp
+        WHERE C_CMID_TPL IN (SELECT C_CODE FROM t_sys_cmid_tpl WHERE CM_ID LIKE CONCAT('%', #{CM_ID}))
+        AND C_CODE_CTGY = #{C_CODE_CTGY}
+        ORDER BY I_SORT;
+    </select>
+
+    <!-- 제품: 그룹 확인 -->
+    <select id="SELECT_PRODUCT_GROUP_EXISTS" parameterType="hashmap" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_prdt_grp
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- 제품: 그룹 추가 -->
+    <insert id="INSERT_PRODUCT_GROUP" parameterType="hashmap">
+        INSERT
+        INTO t_prdt_grp
+        (C_CODE_CTGY,
+         C_CODE,
+         N_NAME,
+         C_CMID_TPL,
+         I_SORT,
+         I_LST,
+         D_MOD_DT)
+        VALUES (#{C_CODE_CTGY},
+                #{C_CODE},
+                fn_set_i18n(CONCAT('prdt.grp.', #{C_CODE}), #{N_LANG}, #{N_NAME}),
+                fn_set_cmid_tpl(CONCAT('prdt.grp.', #{C_CODE}), #{CM_IDS}),
+                (SELECT IFNULL(MAX(I_SORT) + 1, 1)
+                 FROM t_prdt_grp T
+                ),
+                #{LOGIN_I_ID},
+                NOW())
+    </insert>
+
+    <!-- 제품: 그룹 수정 -->
+    <update id="UPDATE_PRODUCT_GROUP" parameterType="hashmap">
+        UPDATE t_prdt_grp
+        SET N_NAME     = fn_set_i18n(CONCAT('prdt.grp.', #{C_CODE}), #{N_LANG}, #{N_NAME}),
+            C_CMID_TPL = fn_set_cmid_tpl(CONCAT('prdt.grp.', #{C_CODE}), #{CM_IDS}),
+            I_LST      = #{LOGIN_I_ID},
+            D_MOD_DT   = NOW()
+        WHERE C_CODE = #{C_CODE}
+    </update>
+
+    <!-- 제품: 그룹 삭제 -->
+    <delete id="DELETE_PRODUCT_GROUP" parameterType="hashmap">
+        DELETE
+        FROM t_prdt_grp
+        WHERE C_CODE = #{C_CODE}
+    </delete>
+
+    <!-- 제품: 그룹 순서 수정 -->
+    <update id="UPDATE_PRODUCT_GROUP_SORT" parameterType="hashmap">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE t_prdt_grp
+            SET I_SORT = #{item.I_SORT},
+            I_LST = #{LOGIN_I_ID},
+            D_MOD_DT = NOW()
+            WHERE C_CODE = #{item.C_CODE}
+        </foreach>
+    </update>
+
+    <!-- 제품: 제품 목록 -->
+    <select id="SELECT_PRODUCT_PRODUCT_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT A.I_SEQ, B.S_ICON, B.C_CODE, fn_get_i18n(N_BRAND_NAME, #{N_LANG}) N_BRAND_NAME, fn_get_i18n(N_PRODUCT_NAME, #{N_LANG}) N_PRODUCT_NAME, B.S_PWI, A.I_SORT
+        FROM t_prdt_grp_tpl A,
+             t_prdt_template B
+        WHERE A.C_CODE_GRP = #{C_CODE_GRP}
+          AND A.C_CODE = B.C_CODE
+        ORDER BY I_SORT;
+    </select>
+
+    <!-- 제품: 제품 추가 -->
+    <insert id="INSERT_PRODUCT_PRODUCT" parameterType="hashmap">
+        INSERT INTO t_prdt_grp_tpl
+        (C_CODE_GRP,
+         C_CODE,
+         I_SORT,
+         I_LST,
+         D_MOD_DT)
+        VALUES (#{C_CODE_GRP},
+                #{C_CODE},
+                (SELECT IFNULL(MAX(I_SORT) + 1, 1)
+                 FROM t_prdt_grp_tpl T
+                 WHERE C_CODE = #{C_CODE}
+                   AND C_CODE_GRP = #{C_CODE_GRP}
+                ),
+                #{LOGIN_I_ID},
+                NOW())
+    </insert>
+
+    <!-- 제품: 제품 삭제 -->
+    <delete id="DELETE_PRODUCT_PRODUCT" parameterType="hashmap">
+        DELETE
+        FROM t_prdt_grp_tpl
+        WHERE I_SEQ = #{I_SEQ};
+    </delete>
+
+    <!-- 제품: 제품 순서 수정 -->
+    <update id="UPDATE_PRODUCT_PRODUCT_SORT" parameterType="hashmap">
+        <foreach collection="list" item="item" index="index" separator=";">
+            UPDATE t_prdt_grp_tpl
+            SET I_SORT = #{item.I_SORT},
+            I_LST = #{LOGIN_I_ID},
+            D_MOD_DT = NOW()
+            WHERE I_SEQ = #{item.I_SEQ}
+        </foreach>
+    </update>
+
+    <!-- 제품: 템플릿 목록 -->
+    <select id="SELECT_PRODUCT_TEMPLATE_LIST" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT S_ICON,
+               C_CODE,
+               fn_get_i18n(N_BRAND_NAME, #{N_LANG})   N_BRAND_NAME,
+               fn_get_i18n(N_PRODUCT_NAME, #{N_LANG}) N_PRODUCT_NAME,
+               S_PWI
+        FROM t_prdt_template
+        WHERE C_CODE LIKE CONCAT('%', #{C_CODE}, '%')
+          AND N_BRAND_NAME IN (
+            SELECT S_CODE
+            FROM t_i18n
+            WHERE S_CODE LIKE 'i18n.prdt.template.brand_name%'
+              AND S_LOCALE = #{N_LANG}
+              AND S_DESC like CONCAT('%', #{N_BRAND_NAME}, '%')
+        )
+          AND N_PRODUCT_NAME IN (
+            SELECT S_CODE
+            FROM t_i18n
+            WHERE S_CODE LIKE 'i18n.prdt.template.product_name%'
+              AND S_LOCALE = #{N_LANG}
+              AND S_DESC like CONCAT('%', #{N_PRODUCT_NAME}, '%')
+        )
+          AND S_PWI LIKE CONCAT('%', #{S_PWI}, '%')
+        ORDER BY C_CODE
+    </select>
+
+    <!-- 제품: 템플릿 확인 -->
+    <select id="SELECT_PRODUCT_TEMPLATE_EXISTS" parameterType="hashmap" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM t_prdt_template
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- 제품: 템플릿 -->
+    <select id="SELECT_PRODUCT_TEMPLATE" parameterType="hashmap" resultType="com.dma.share.ResultMap">
+        SELECT C_CODE,
+               fn_get_i18n(N_BRAND_NAME, #{N_LANG})   N_BRAND_NAME,
+               fn_get_i18n(N_PRODUCT_NAME, #{N_LANG}) N_PRODUCT_NAME,
+               S_PWI_SEX,
+               S_PWI_AGE,
+               S_PWI,
+               S_MEMO,
+               S_URL,
+               Y_URL,
+               Y_ICON,
+               S_ICON
+        FROM t_prdt_template
+        WHERE C_CODE = #{C_CODE}
+    </select>
+
+    <!-- 제품: 템플릿 추가 -->
+    <insert id="INSERT_PRODUCT_TEMPLATE" parameterType="hashmap">
+        INSERT INTO t_prdt_template(C_CODE, N_BRAND_NAME, N_PRODUCT_NAME, S_PWI_SEX, S_PWI_AGE, S_PWI, S_MEMO, S_URL, Y_URL, Y_ICON, S_ICON, I_LST, D_MOD_DT)
+        VALUES (#{C_CODE},
+                fn_set_i18n(CONCAT('i18n.prdt.template.brand_name.', #{C_CODE}), #{N_LANG}, #{N_BRAND_NAME}),
+                fn_set_i18n(CONCAT('i18n.prdt.template.product_name.', #{C_CODE}), #{N_LANG}, #{N_PRODUCT_NAME}),
+                #{S_PWI_SEX},
+                #{S_PWI_AGE},
+                #{S_PWI},
+                #{S_MEMO},
+                #{S_URL},
+                #{Y_URL},
+                #{Y_ICON},
+                #{S_ICON},
+                #{LOGIN_I_ID},
+                NOW());
+    </insert>
+
+    <!-- 제품: 템플릿 수정 -->
+    <update id="UPDATE_PRODUCT_TEMPLATE" parameterType="hashmap">
+        UPDATE t_prdt_template
+        SET N_BRAND_NAME   = fn_set_i18n(CONCAT('i18n.prdt.template.brand_name.', #{C_CODE}), #{N_LANG}, #{N_BRAND_NAME}),
+            N_PRODUCT_NAME = fn_set_i18n(CONCAT('i18n.prdt.template.product_name.', #{C_CODE}), #{N_LANG}, #{N_PRODUCT_NAME}),
+            S_PWI_SEX      = #{S_PWI_SEX},
+            S_PWI_AGE      = #{S_PWI_AGE},
+            S_PWI          = #{S_PWI},
+            S_MEMO         = #{S_MEMO},
+            S_URL          = #{S_URL},
+            Y_URL          = #{Y_URL},
+            Y_ICON         = #{Y_ICON},
+            S_ICON         = #{S_ICON},
+            I_LST          = #{LOGIN_I_ID},
+            D_MOD_DT       = NOW()
+        WHERE C_CODE = #{C_CODE}
+    </update>
+
+    <!-- 제품: 템플릿 삭제 -->
+    <delete id="DELETE_PRODUCT_TEMPLATE" parameterType="hashmap">
+        DELETE
+        FROM t_prdt_template
+        WHERE C_CODE = #{C_CODE}
+    </delete>
+</mapper>
